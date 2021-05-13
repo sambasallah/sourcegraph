@@ -10,6 +10,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/inconshreveable/log15"
 	"github.com/keegancsmith/sqlf"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -27,6 +28,7 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/extsvc/github"
 	"github.com/sourcegraph/sourcegraph/internal/extsvc/gitlab"
 	"github.com/sourcegraph/sourcegraph/internal/extsvc/gitolite"
+	"github.com/sourcegraph/sourcegraph/internal/extsvc/jvmpackages"
 	"github.com/sourcegraph/sourcegraph/internal/extsvc/perforce"
 	"github.com/sourcegraph/sourcegraph/internal/trace"
 	"github.com/sourcegraph/sourcegraph/internal/types"
@@ -332,6 +334,7 @@ func scanRepo(rows *sql.Rows, r *types.Repo) (err error) {
 
 	typ, ok := extsvc.ParseServiceType(r.ExternalRepo.ServiceType)
 	if !ok {
+		log15.Error("scanRepo - failed to parseservice type", "r.ExternalRepo.ServiceType", r.ExternalRepo.ServiceType)
 		return nil
 	}
 	switch typ {
@@ -351,7 +354,10 @@ func scanRepo(rows *sql.Rows, r *types.Repo) (err error) {
 		r.Metadata = new(perforce.Depot)
 	case extsvc.TypeOther:
 		r.Metadata = new(extsvc.OtherRepoMetadata)
+	case extsvc.TypeJvmPackages:
+		r.Metadata = new(jvmpackages.Metadata)
 	default:
+		log15.Error("scanRepo - unknown service type", "typ", typ)
 		return nil
 	}
 
