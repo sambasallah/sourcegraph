@@ -21,7 +21,13 @@ import { DEFAULT_SOURCEGRAPH_URL, observeSourcegraphURL } from '../util/context'
 
 import { createExtensionHost } from './extensionHost'
 import { getInlineExtensions, shouldUseInlineExtensions } from './inlineExtensionsService'
-import { editClientSettings, fetchViewerSettings, mergeCascades, storageSettingsCascade } from './settings'
+import {
+    editClientSettings,
+    fetchFeatureFlags,
+    fetchViewerSettings,
+    mergeCascades,
+    storageSettingsCascade,
+} from './settings'
 
 export interface SourcegraphIntegrationURLs {
     /**
@@ -141,6 +147,7 @@ export function createPlatformContext(
             await context.refreshSettings()
         },
         requestGraphQL,
+        featureFlags: fetchFeatureFlags(requestGraphQL),
         forceUpdateTooltip: () => {
             // TODO(sqs): implement tooltips on the browser extension
         },
