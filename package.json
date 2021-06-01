@@ -83,10 +83,10 @@
   },
   "devDependencies": {
     "@atlassian/aui": "^7.10.1",
-    "@babel/core": "^7.14.2",
+    "@babel/core": "^7.14.3",
     "@babel/plugin-proposal-decorators": "^7.14.2",
-    "@babel/plugin-transform-typescript": "^7.13.0",
-    "@babel/preset-env": "^7.14.2",
+    "@babel/plugin-transform-typescript": "^7.14.4",
+    "@babel/preset-env": "^7.14.4",
     "@babel/preset-typescript": "^7.13.0",
     "@babel/runtime": "^7.14.0",
     "@gql2ts/from-schema": "^1.10.1",
