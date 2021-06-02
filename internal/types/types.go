@@ -1064,6 +1064,9 @@ type CodeInsightsUsageStatistics struct {
 	WeekStart                      time.Time
 	WeeklyInsightCreators          *int32
 	WeeklyFirstTimeInsightCreators *int32
+	WeeklyAggregatedUsage          []AggregatedPingStats
+	InsightTimeIntervals           []InsightTimeIntervalPing
+	InsightOrgVisible              []OrgVisibleInsightPing
 }
 
 // Usage statistics for a type of code insight
@@ -1075,6 +1078,25 @@ type InsightUsageStatistics struct {
 	Hovers           *int32
 	UICustomizations *int32
 	DataPointClicks  *int32
+}
+
+type PingName string
+
+//AggregatedPingStats Generic representation of an aggregated ping statistic
+type AggregatedPingStats struct {
+	Name        PingName
+	TotalCount  int
+	UniqueCount int
+}
+
+type InsightTimeIntervalPing struct {
+	IntervalDays int
+	TotalCount   int
+}
+
+type OrgVisibleInsightPing struct {
+	Type       string
+	TotalCount int
 }
 
 type CodeMonitoringUsageStatistics struct {
