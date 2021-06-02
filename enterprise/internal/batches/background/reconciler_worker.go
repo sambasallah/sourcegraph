@@ -3,6 +3,7 @@ package background
 import (
 	"context"
 	"database/sql"
+	"os"
 	"time"
 
 	"github.com/keegancsmith/sqlf"
@@ -35,11 +36,14 @@ func newReconcilerWorker(
 ) *workerutil.Worker {
 	r := reconciler.New(gitClient, sourcer, s)
 
+	hostname, _ := os.Hostname()
+
 	options := workerutil.WorkerOptions{
-		Name:        "batches_reconciler_worker",
-		NumHandlers: 5,
-		Interval:    5 * time.Second,
-		Metrics:     metrics.reconcilerWorkerMetrics,
+		Name:           "batches_reconciler_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    5,
+		Interval:       5 * time.Second,
+		Metrics:        metrics.reconcilerWorkerMetrics,
 	}
 
 	workerStore := createReconcilerDBWorkerStore(s)

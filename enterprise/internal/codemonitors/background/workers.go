@@ -3,6 +3,7 @@ package background
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -22,11 +23,14 @@ const (
 )
 
 func newTriggerQueryRunner(ctx context.Context, s *cm.Store, metrics codeMonitorsMetrics) *workerutil.Worker {
+	hostname, _ := os.Hostname()
+
 	options := workerutil.WorkerOptions{
-		Name:        "code_monitors_trigger_jobs_worker",
-		NumHandlers: 1,
-		Interval:    5 * time.Second,
-		Metrics:     metrics.workerMetrics,
+		Name:           "code_monitors_trigger_jobs_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    1,
+		Interval:       5 * time.Second,
+		Metrics:        metrics.workerMetrics,
 	}
 	worker := dbworker.NewWorker(ctx, createDBWorkerStoreForTriggerJobs(s), &queryRunner{s}, options)
 	return worker
@@ -76,11 +80,14 @@ func newTriggerJobsLogDeleter(ctx context.Context, store *cm.Store) goroutine.Ba
 }
 
 func newActionRunner(ctx context.Context, s *cm.Store, metrics codeMonitorsMetrics) *workerutil.Worker {
+	hostname, _ := os.Hostname()
+
 	options := workerutil.WorkerOptions{
-		Name:        "code_monitors_action_jobs_worker",
-		NumHandlers: 1,
-		Interval:    5 * time.Second,
-		Metrics:     metrics.workerMetrics,
+		Name:           "code_monitors_action_jobs_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    1,
+		Interval:       5 * time.Second,
+		Metrics:        metrics.workerMetrics,
 	}
 	worker := dbworker.NewWorker(ctx, createDBWorkerStoreForActionJobs(s), &actionRunner{s}, options)
 	return worker
@@ -173,7 +180,6 @@ func (r *queryRunner) Handle(ctx context.Context, workerStore dbworkerstore.Stor
 	err = s.LogSearch(ctx, newQuery, numResults, record.RecordID())
 	if err != nil {
 		return fmt.Errorf("LogSearch: %w", err)
-
 	}
 	return nil
 }

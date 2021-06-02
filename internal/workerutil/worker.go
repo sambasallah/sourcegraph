@@ -32,6 +32,10 @@ type WorkerOptions struct {
 	// supplied.
 	Name string
 
+	// WorkerHostname denotes the hostname of the instance/container the worker
+	// is running on.
+	WorkerHostname string
+
 	// NumHandlers is the maximum number of handlers that can be invoked
 	// concurrently. The underlying store will not be queried while the current
 	// number of handlers exceeds this value.
@@ -147,7 +151,7 @@ func (w *Worker) dequeueAndHandle() (dequeued bool, err error) {
 	}
 
 	// Select a queued record to process and the transaction that holds it
-	record, tx, dequeued, err := w.store.Dequeue(w.ctx, extraDequeueArguments)
+	record, tx, dequeued, err := w.store.Dequeue(w.ctx, w.options.WorkerHostname, extraDequeueArguments)
 	if err != nil {
 		return false, errors.Wrap(err, "store.Dequeue")
 	}

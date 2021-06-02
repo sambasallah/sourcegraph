@@ -2,6 +2,7 @@ package worker
 
 import (
 	"context"
+	"os"
 	"time"
 
 	"github.com/sourcegraph/sourcegraph/enterprise/internal/codeintel/stores/uploadstore"
@@ -33,10 +34,13 @@ func NewWorker(
 		budgetRemaining: budgetMax,
 	}
 
+	hostname, _ := os.Hostname()
+
 	return dbworker.NewWorker(rootContext, workerStore, handler, workerutil.WorkerOptions{
-		Name:        "precise_code_intel_upload_worker",
-		NumHandlers: numProcessorRoutines,
-		Interval:    pollInterval,
-		Metrics:     workerMetrics,
+		Name:           "precise_code_intel_upload_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    numProcessorRoutines,
+		Interval:       pollInterval,
+		Metrics:        workerMetrics,
 	})
 }

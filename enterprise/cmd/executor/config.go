@@ -2,6 +2,7 @@ package main
 
 import (
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -70,11 +71,13 @@ func (c *Config) APIWorkerOptions(transport http.RoundTripper) apiworker.Options
 }
 
 func (c *Config) WorkerOptions() workerutil.WorkerOptions {
+	hostname, _ := os.Hostname()
 	return workerutil.WorkerOptions{
-		Name:        "precise_code_intel_index_worker",
-		NumHandlers: c.MaximumNumJobs,
-		Interval:    c.QueuePollInterval,
-		Metrics:     makeWorkerMetrics(c.QueueName),
+		Name:           "precise_code_intel_index_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    c.MaximumNumJobs,
+		Interval:       c.QueuePollInterval,
+		Metrics:        makeWorkerMetrics(c.QueueName),
 	}
 }
 
@@ -95,8 +98,10 @@ func (c *Config) ResourceOptions() command.ResourceOptions {
 }
 
 func (c *Config) ClientOptions(transport http.RoundTripper) apiclient.Options {
+	hostname, _ := os.Hostname()
 	return apiclient.Options{
 		ExecutorName:      uuid.New().String(),
+		ExecutorHostname:  hostname,
 		PathPrefix:        "/.executors/queue",
 		EndpointOptions:   c.EndpointOptions(),
 		BaseClientOptions: c.BaseClientOptions(transport),

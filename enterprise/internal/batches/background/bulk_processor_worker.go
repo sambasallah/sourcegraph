@@ -3,6 +3,7 @@ package background
 import (
 	"context"
 	"database/sql"
+	"os"
 	"time"
 
 	"github.com/keegancsmith/sqlf"
@@ -33,11 +34,14 @@ func newBulkOperationWorker(
 ) *workerutil.Worker {
 	r := &bulkProcessorWorker{sourcer: sourcer, store: s}
 
+	hostname, _ := os.Hostname()
+
 	options := workerutil.WorkerOptions{
-		Name:        "batches_bulk_processor",
-		NumHandlers: 5,
-		Interval:    5 * time.Second,
-		Metrics:     metrics.bulkProcessorWorkerMetrics,
+		Name:           "batches_bulk_processor",
+		WorkerHostname: hostname,
+		NumHandlers:    5,
+		Interval:       5 * time.Second,
+		Metrics:        metrics.bulkProcessorWorkerMetrics,
 	}
 
 	workerStore := createBulkOperationDBWorkerStore(s)

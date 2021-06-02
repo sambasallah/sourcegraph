@@ -3,6 +3,7 @@ package repos
 import (
 	"context"
 	"database/sql"
+	"os"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -64,11 +65,14 @@ func NewSyncWorker(ctx context.Context, db dbutil.DB, handler dbworker.Handler, 
 		MaxNumRetries:     0,
 	})
 
+	hostname, _ := os.Hostname()
+
 	worker := dbworker.NewWorker(ctx, store, handler, workerutil.WorkerOptions{
-		Name:        "repo_sync_worker",
-		NumHandlers: opts.NumHandlers,
-		Interval:    opts.WorkerInterval,
-		Metrics:     newWorkerMetrics(opts.PrometheusRegisterer),
+		Name:           "repo_sync_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    opts.NumHandlers,
+		Interval:       opts.WorkerInterval,
+		Metrics:        newWorkerMetrics(opts.PrometheusRegisterer),
 	})
 
 	resetter := dbworker.NewResetter(store, dbworker.ResetterOptions{

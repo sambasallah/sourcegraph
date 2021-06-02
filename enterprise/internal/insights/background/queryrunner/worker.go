@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/inconshreveable/log15"
@@ -40,11 +41,14 @@ func NewWorker(ctx context.Context, workerBaseStore *basestore.Store, insightsSt
 		numHandlers = 1
 	}
 
+	hostname, _ := os.Hostname()
+
 	options := workerutil.WorkerOptions{
-		Name:        "insights_query_runner_worker",
-		NumHandlers: numHandlers,
-		Interval:    5 * time.Second,
-		Metrics:     metrics,
+		Name:           "insights_query_runner_worker",
+		WorkerHostname: hostname,
+		NumHandlers:    numHandlers,
+		Interval:       5 * time.Second,
+		Metrics:        metrics,
 	}
 
 	defaultRateLimit := rate.Limit(2.0)
