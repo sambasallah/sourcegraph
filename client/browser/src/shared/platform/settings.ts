@@ -170,6 +170,37 @@ export function fetchViewerSettings(
     )
 }
 
+export function fetchFeatureFlags(
+    requestGraphQL: PlatformContext['requestGraphQL']
+): Observable<{ [key: string]: boolean }> {
+    return from(
+        requestGraphQL<GQL.IEvaluatedFeatureFlag[]>({
+            request: gql`
+                query FetchFeatureFlags {
+                    viewerFeatureFlags {
+                        name
+                        value
+                    }
+                }
+            `,
+            variables: {},
+            mightContainPrivateInfo: false,
+        })
+    ).pipe(
+        map(dataOrThrowErrors),
+        map(data => {
+            if (!data) {
+                return {}
+            }
+            var res: { [key: string]: boolean } = {}
+            for (var flag of data) {
+                res[flag.name] = flag.value
+            }
+            return res
+        })
+    )
+}
+
 /**
  * Applies an edit and persists the result to client settings.
  */
