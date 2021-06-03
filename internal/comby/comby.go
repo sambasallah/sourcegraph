@@ -13,7 +13,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/pkg/errors"
+	"github.com/cockroachdb/errors"
 
 	"github.com/inconshreveable/log15"
 
