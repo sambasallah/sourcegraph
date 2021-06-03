@@ -11,12 +11,12 @@ import { gqlToCascade } from '@sourcegraph/shared/src/settings/settings'
 import { createAggregateError, asError } from '@sourcegraph/shared/src/util/errors'
 import { LocalStorageSubject } from '@sourcegraph/shared/src/util/LocalStorageSubject'
 import {
-	toPrettyBlobURL,
-	RepoFile,
-	UIPositionSpec,
-	ViewStateSpec,
-	RenderModeSpec,
-	UIRangeSpec,
+    toPrettyBlobURL,
+    RepoFile,
+    UIPositionSpec,
+    ViewStateSpec,
+    RenderModeSpec,
+    UIRangeSpec,
 } from '@sourcegraph/shared/src/util/url'
 
 import { queryGraphQL, requestGraphQL } from '../backend/graphql'
@@ -26,63 +26,64 @@ import { eventLogger } from '../tracking/eventLogger'
  * Creates the {@link PlatformContext} for the web app.
  */
 export function createPlatformContext(): PlatformContext {
-	const updatedSettings = new ReplaySubject<GQL.ISettingsCascade>(1)
-	const context: PlatformContext = {
-		featureFlags: fetchFeatureFlags(),
-		settings: concat(fetchViewerSettings(), updatedSettings).pipe(map(gqlToCascade), publishReplay(1), refCount()),
-		updateSettings: async (subject, edit) => {
-			// Unauthenticated users can't update settings. (In the browser extension, they can update client
-			// settings even when not authenticated. The difference in behavior in the web app vs. browser
-			// extension is why this logic lives here and not in shared/.)
-			if (!window.context.isAuthenticatedUser) {
-				const editDescription =
-					typeof edit === 'string' ? 'edit settings' : 'update setting `' + edit.path.join('.') + '`'
-				const url = new URL(window.context.externalURL)
-				throw new Error(
-					`Unable to ${editDescription} because you are not signed in.` +
-					'\n\n' +
-					`[**Sign into Sourcegraph${url.hostname === 'sourcegraph.com' ? '' : ` on ${url.host}`
-					}**](${`${url.href.replace(/\/$/, '')}/sign-in`})`
-				)
-			}
+    const updatedSettings = new ReplaySubject<GQL.ISettingsCascade>(1)
+    const context: PlatformContext = {
+        featureFlags: fetchFeatureFlags(),
+        settings: concat(fetchViewerSettings(), updatedSettings).pipe(map(gqlToCascade), publishReplay(1), refCount()),
+        updateSettings: async (subject, edit) => {
+            // Unauthenticated users can't update settings. (In the browser extension, they can update client
+            // settings even when not authenticated. The difference in behavior in the web app vs. browser
+            // extension is why this logic lives here and not in shared/.)
+            if (!window.context.isAuthenticatedUser) {
+                const editDescription =
+                    typeof edit === 'string' ? 'edit settings' : 'update setting `' + edit.path.join('.') + '`'
+                const url = new URL(window.context.externalURL)
+                throw new Error(
+                    `Unable to ${editDescription} because you are not signed in.` +
+                        '\n\n' +
+                        `[**Sign into Sourcegraph${
+                            url.hostname === 'sourcegraph.com' ? '' : ` on ${url.host}`
+                        }**](${`${url.href.replace(/\/$/, '')}/sign-in`})`
+                )
+            }
 
-			try {
-				await updateSettings(context, subject, edit, mutateSettings)
-			} catch (error) {
-				if (asError(error).message.includes('version mismatch')) {
-					// The user probably edited the settings in another tab, so
-					// try once more.
-					updatedSettings.next(await fetchViewerSettings().toPromise())
-					await updateSettings(context, subject, edit, mutateSettings)
-				} else {
-					throw error
-				}
-			}
-			updatedSettings.next(await fetchViewerSettings().toPromise())
-		},
-		requestGraphQL: ({ request, variables }) => requestGraphQL(request, variables),
-		forceUpdateTooltip: () => Tooltip.forceUpdate(),
-		createExtensionHost: () => Promise.resolve(createExtensionHost()),
-		urlToFile: toPrettyWebBlobURL,
-		getScriptURLForExtension: () => undefined,
-		sourcegraphURL: window.context.externalURL,
-		clientApplication: 'sourcegraph',
-		sideloadedExtensionURL: new LocalStorageSubject<string | null>('sideloadedExtensionURL', null),
-		telemetryService: eventLogger,
-	}
-	return context
+            try {
+                await updateSettings(context, subject, edit, mutateSettings)
+            } catch (error) {
+                if (asError(error).message.includes('version mismatch')) {
+                    // The user probably edited the settings in another tab, so
+                    // try once more.
+                    updatedSettings.next(await fetchViewerSettings().toPromise())
+                    await updateSettings(context, subject, edit, mutateSettings)
+                } else {
+                    throw error
+                }
+            }
+            updatedSettings.next(await fetchViewerSettings().toPromise())
+        },
+        requestGraphQL: ({ request, variables }) => requestGraphQL(request, variables),
+        forceUpdateTooltip: () => Tooltip.forceUpdate(),
+        createExtensionHost: () => Promise.resolve(createExtensionHost()),
+        urlToFile: toPrettyWebBlobURL,
+        getScriptURLForExtension: () => undefined,
+        sourcegraphURL: window.context.externalURL,
+        clientApplication: 'sourcegraph',
+        sideloadedExtensionURL: new LocalStorageSubject<string | null>('sideloadedExtensionURL', null),
+        telemetryService: eventLogger,
+    }
+    return context
 }
 
 function toPrettyWebBlobURL(
-	context: RepoFile &
-		Partial<UIPositionSpec> &
-		Partial<ViewStateSpec> &
-		Partial<UIRangeSpec> &
-		Partial<RenderModeSpec>
+    context: RepoFile &
+        Partial<UIPositionSpec> &
+        Partial<ViewStateSpec> &
+        Partial<UIRangeSpec> &
+        Partial<RenderModeSpec>
 ): string {
-	const url = new URL(toPrettyBlobURL(context), location.href)
-	url.searchParams.set('subtree', 'true')
-	return url.pathname + url.search + url.hash
+    const url = new URL(toPrettyBlobURL(context), location.href)
+    url.searchParams.set('subtree', 'true')
+    return url.pathname + url.search + url.hash
 }
 
 const settingsCascadeFragment = gql`
@@ -122,7 +123,7 @@ const settingsCascadeFragment = gql`
  * @returns Observable that emits the settings
  */
 function fetchViewerSettings(): Observable<GQL.ISettingsCascade> {
-	return queryGraphQL(gql`
+    return queryGraphQL(gql`
         query ViewerSettings {
             viewerSettings {
                 ...SettingsCascadeFields
@@ -130,41 +131,41 @@ function fetchViewerSettings(): Observable<GQL.ISettingsCascade> {
         }
         ${settingsCascadeFragment}
     `).pipe(
-		map(({ data, errors }) => {
-			if (!data?.viewerSettings) {
-				throw createAggregateError(errors)
-			}
-			return data.viewerSettings
-		})
-	)
+        map(({ data, errors }) => {
+            if (!data?.viewerSettings) {
+                throw createAggregateError(errors)
+            }
+            return data.viewerSettings
+        })
+    )
 }
 
 function fetchFeatureFlags(): Observable<{ [key: string]: boolean }> {
-	return requestGraphQL<GQL.IEvaluatedFeatureFlag[]>(
-		gql`
-            query FetchFeatureFlags{
+    return requestGraphQL<GQL.IEvaluatedFeatureFlag[]>(
+        gql`
+            query FetchFeatureFlags {
                 viewerFeatureFlags {
                     name
                     value
                 }
             }
         `
-	).pipe(
-		map(({ data, errors }) => {
-			if (errors) {
-				throw createAggregateError(errors)
-			}
-			if (!data) {
-				throw new Error('Data is undefined')
-			}
-			return data
-		}),
-		map(data => {
-			var res: { [key: string]: boolean } = {}
-			for (var flag of data) {
-				res[flag.name] = flag.value
-			}
-			return res
-		})
-	)
+    ).pipe(
+        map(({ data, errors }) => {
+            if (errors) {
+                throw createAggregateError(errors)
+            }
+            if (!data) {
+                throw new Error('Data is undefined')
+            }
+            return data
+        }),
+        map(data => {
+            var res: { [key: string]: boolean } = {}
+            for (var flag of data) {
+                res[flag.name] = flag.value
+            }
+            return res
+        })
+    )
 }

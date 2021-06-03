@@ -75,10 +75,7 @@ export interface PlatformContext {
     readonly settings: Subscribable<SettingsCascadeOrError<Settings>>
 
     /**
-     * An observable that emits the settings cascade upon subscription and whenever it changes (including when it
-     * changes as a result of a call to {@link PlatformContext#updateSettings}).
-     *
-     * It should be a cold observable so that it does not trigger a network request upon each subscription.
+     * An observable that emits the viewer's feature flags
      */
     readonly featureFlags: Observable<{ [key: string]: boolean }>
 
