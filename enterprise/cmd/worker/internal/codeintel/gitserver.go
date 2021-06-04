@@ -14,7 +14,7 @@ import (
 )
 
 // InitGitserverClient initializes and returns a gitserver client.
-func InitGitserverClient() (*sql.DB, error) {
+func InitGitserverClient() (*gitserver.Client, error) {
 	conn, err := initGitserverClient.Init()
 	return conn.(*sql.DB), err
 }
