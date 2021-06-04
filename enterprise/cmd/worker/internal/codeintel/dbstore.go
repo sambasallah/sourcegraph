@@ -11,7 +11,7 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/trace"
 )
 
-// InitDBStore initializes and returns a db store.
+// InitDBStore initializes and returns a db store instance.
 func InitDBStore() (*dbstore.Store, error) {
 	conn, err := initDBStore.Init()
 	return conn.(*dbstore.Store), err
