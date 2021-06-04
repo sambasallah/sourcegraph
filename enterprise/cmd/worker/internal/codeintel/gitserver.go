@@ -16,7 +16,7 @@ import (
 // InitGitserverClient initializes and returns a gitserver client.
 func InitGitserverClient() (*gitserver.Client, error) {
 	conn, err := initGitserverClient.Init()
-	return conn.(*sql.DB), err
+	return conn.(*gitserver.Client), err
 }
 
 var initGitserverClient = shared.NewMemoizedConstructor(func() (interface{}, error) {
