@@ -1,8 +1,6 @@
 package codeintel
 
 import (
-	"database/sql"
-
 	"github.com/inconshreveable/log15"
 	"github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus"
