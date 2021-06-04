@@ -45,6 +45,7 @@ func ParseMavenDependencyString(dependency string) Dependency {
 		Version: parts[2],
 	}
 }
+
 func ParseMavenDependency(module Module, dependency string) Dependency {
 	colonIndex := strings.LastIndex(dependency, ":") + 1
 	return Dependency{

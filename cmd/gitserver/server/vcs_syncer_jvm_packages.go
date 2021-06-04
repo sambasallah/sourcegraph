@@ -144,12 +144,13 @@ func (s JvmPackagesArtifactSyncer) TrackedDependencies(path string) (dependencie
 }
 
 func (s JvmPackagesArtifactSyncer) gitPushDependencyTag(ctx context.Context, bareGitDirectory string, dependency reposource.Dependency) error {
-	workingDirectory, err := ioutil.TempDir("", "maven")
+	tmpDirectory, err := ioutil.TempDir("", "maven")
 	if err != nil {
 		return err
 	}
+	defer os.RemoveAll(tmpDirectory)
 
-	gitTag := "v" + string(reposource.DefaultRepositoryPathPattern)
+	gitTag := "v" + dependency.Version
 
 	paths, err := coursier.FetchSources(ctx, s.Config, dependency)
 	if err != nil {
@@ -163,25 +164,25 @@ func (s JvmPackagesArtifactSyncer) gitPushDependencyTag(ctx context.Context, bar
 	path := paths[0]
 
 	initCmd := exec.CommandContext(ctx, "git", "init", "--initial-branch", gitTag)
-	initCmd.Dir = workingDirectory
-	log15.Info("CloneCommand", "tmpPath", workingDirectory, "cwd", initCmd.Dir)
+	initCmd.Dir = tmpDirectory
+	log15.Info("CloneCommand", "tmpPath", tmpDirectory, "cwd", initCmd.Dir)
 	if output, err := runWith(ctx, initCmd, false, nil); err != nil {
 		return errors.Wrapf(err, "command %s failed with output %q", initCmd.Args, string(output))
 	}
 
-	err = s.commitJar(ctx, dependency, workingDirectory, path)
+	err = s.commitJar(ctx, dependency, tmpDirectory, path)
 	if err != nil {
 		return err
 	}
 
 	remoteAddCmd := exec.CommandContext(ctx, "git", "remote", "add", "origin", bareGitDirectory)
-	remoteAddCmd.Dir = workingDirectory
+	remoteAddCmd.Dir = tmpDirectory
 	if output, err := runWith(ctx, remoteAddCmd, false, nil); err != nil {
 		return errors.Wrapf(err, "command %s failed with output %q", remoteAddCmd.Args, string(output))
 	}
 
 	gitPushCmd := exec.CommandContext(ctx, "git", "push", "origin", gitTag)
-	gitPushCmd.Dir = workingDirectory
+	gitPushCmd.Dir = tmpDirectory
 	if output, err := runWith(ctx, gitPushCmd, false, nil); err != nil {
 		return errors.Wrapf(err, "command %s failed with output %q", gitPushCmd.Args, string(output))
 	}
