@@ -8,7 +8,7 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/database/dbconn"
 )
 
-// InitDatabases initializes and returns a connection to the frontend database.
+// InitDatabase initializes and returns a connection to the frontend database.
 func InitDatabase() (*sql.DB, error) {
 	conn, err := initDatabaseMemo.Init()
 	return conn.(*sql.DB), err
