@@ -9,13 +9,13 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/database/dbconn"
 )
 
-// TODO - document
+// InitCodeIntelDatabase initializes and returns a connection to the codeintel db.
 func InitCodeIntelDatabase() (*sql.DB, error) {
 	conn, err := initCodeIntelDatabaseMemo.Init()
 	return conn.(*sql.DB), err
 }
 
-var initCodeIntelDatabaseMemo = shared.NewMemo(func() (interface{}, error) {
+var initCodeIntelDatabaseMemo = shared.NewMemoizedConstructor(func() (interface{}, error) {
 	postgresDSN := shared.WatchServiceConnectionValue(func(serviceConnections conftypes.ServiceConnections) string {
 		return serviceConnections.CodeIntelPostgresDSN
 	})

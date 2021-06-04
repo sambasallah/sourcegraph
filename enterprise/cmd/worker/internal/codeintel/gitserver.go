@@ -13,13 +13,13 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/trace"
 )
 
-// TODO - document
+// InitGitserverClient initializes and returns a gitserver client.
 func InitGitserverClient() (*sql.DB, error) {
 	conn, err := initGitserverClient.Init()
 	return conn.(*sql.DB), err
 }
 
-var initGitserverClient = shared.NewMemo(func() (interface{}, error) {
+var initGitserverClient = shared.NewMemoizedConstructor(func() (interface{}, error) {
 	observationContext := &observation.Context{
 		Logger:     log15.Root(),
 		Tracer:     &trace.Tracer{Tracer: opentracing.GlobalTracer()},

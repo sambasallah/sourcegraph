@@ -11,13 +11,13 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/trace"
 )
 
-// TODO - document
+// InitDBStore initializes and returns a db store.
 func InitDBStore() (*dbstore.Store, error) {
 	conn, err := initDBStore.Init()
 	return conn.(*dbstore.Store), err
 }
 
-var initDBStore = shared.NewMemo(func() (interface{}, error) {
+var initDBStore = shared.NewMemoizedConstructor(func() (interface{}, error) {
 	observationContext := &observation.Context{
 		Logger:     log15.Root(),
 		Tracer:     &trace.Tracer{Tracer: opentracing.GlobalTracer()},

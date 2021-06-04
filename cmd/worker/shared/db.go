@@ -8,13 +8,13 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/database/dbconn"
 )
 
-// TODO - document
+// InitDatabases initializes and returns a connection to the frontend database.
 func InitDatabase() (*sql.DB, error) {
 	conn, err := initDatabaseMemo.Init()
 	return conn.(*sql.DB), err
 }
 
-var initDatabaseMemo = NewMemo(func() (interface{}, error) {
+var initDatabaseMemo = NewMemoizedConstructor(func() (interface{}, error) {
 	postgresDSN := WatchServiceConnectionValue(func(serviceConnections conftypes.ServiceConnections) string {
 		return serviceConnections.PostgresDSN
 	})

@@ -11,13 +11,13 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/trace"
 )
 
-// TODO - document
+// InitLSIFStore initializes and returns an LSIF store instance.
 func InitLSIFStore() (*lsifstore.Store, error) {
 	conn, err := initLSFIStore.Init()
 	return conn.(*lsifstore.Store), err
 }
 
-var initLSFIStore = shared.NewMemo(func() (interface{}, error) {
+var initLSFIStore = shared.NewMemoizedConstructor(func() (interface{}, error) {
 	observationContext := &observation.Context{
 		Logger:     log15.Root(),
 		Tracer:     &trace.Tracer{Tracer: opentracing.GlobalTracer()},
