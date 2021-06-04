@@ -330,6 +330,7 @@ func (r *searchResolver) resolveRepositories(ctx context.Context, effectiveRepoF
 	repoFilters, minusRepoFilters := r.Query.Repositories()
 	if effectiveRepoFieldValues != nil {
 		repoFilters = effectiveRepoFieldValues
+
 	}
 	repoGroupFilters, _ := r.Query.StringValues(query.FieldRepoGroup)
 
@@ -390,6 +391,8 @@ func (r *searchResolver) resolveRepositories(ctx context.Context, effectiveRepoF
 		OnlyPublic:         visibility == query.Public,
 		CommitAfter:        commitAfter,
 		Query:              r.Query,
+		Ranked:             true,
+		Limit:              r.MaxResults(),
 	}
 	repositoryResolver := &searchrepos.Resolver{
 		DB:               r.db,

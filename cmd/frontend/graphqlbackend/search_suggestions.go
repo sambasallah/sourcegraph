@@ -271,10 +271,11 @@ func (r *searchResolver) Suggestions(ctx context.Context, args *searchSuggestion
 			resolved, err := r.resolveRepositories(ctx, effectiveRepoFieldValues)
 
 			resolvers := make([]SearchSuggestionResolver, 0, len(resolved.RepoRevs))
-			for _, rev := range resolved.RepoRevs {
+			for i, rev := range resolved.RepoRevs {
 				resolvers = append(resolvers, repositorySuggestionResolver{
-					repo:  NewRepositoryResolver(r.db, rev.Repo.ToRepo()),
-					score: math.MaxInt32,
+					repo: NewRepositoryResolver(r.db, rev.Repo.ToRepo()),
+					// Encode the returned order in score.
+					score: math.MaxInt32 - i,
 				})
 			}
 
